@@ -19,7 +19,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Startup failed: %s", err.Error())
 	}
-	fmt.Println(verb)
 
 	s := server.New(addr, verb, debug)
 	log.Printf("Running server on address %s...", addr)
