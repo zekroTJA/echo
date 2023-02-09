@@ -33,7 +33,7 @@ func New(addr string, verb verbosity.Verbosity, debug bool) *Server {
 }
 
 func (s *Server) registerHandlers() {
-	s.r.Any("/", s.echoHandler)
+	s.r.Any("/*path", s.echoHandler)
 }
 
 func (s *Server) echoHandler(c *gin.Context) {
@@ -46,11 +46,11 @@ func (s *Server) echoHandler(c *gin.Context) {
 		verb = s.verbosity
 	}
 
-	echo := new(echoObject)
+	var echo echoObject
 
 	if verb >= verbosity.Minimal {
 		echo.Method = req.Method
-		echo.RawPath = req.URL.RawPath
+		echo.RawPath = req.URL.Path
 	}
 
 	if verb >= verbosity.Normal {
