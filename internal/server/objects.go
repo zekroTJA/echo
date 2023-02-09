@@ -6,6 +6,6 @@ type echoObject struct {
 	Header        map[string][]string `json:"headers,omitempty"`
 	BodyString    string              `json:"body_string,omitempty"`
 	RemoteAddress string              `json:"remote_address,omitempty"`
-	RawPath       string              `json:"raw_path,omitempty"`
+	Path          string              `json:"path,omitempty"`
 	Query         map[string][]string `json:"query,omitempty"`
 }

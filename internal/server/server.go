@@ -50,7 +50,7 @@ func (s *Server) echoHandler(c *gin.Context) {
 
 	if verb >= verbosity.Minimal {
 		echo.Method = req.Method
-		echo.RawPath = req.URL.Path
+		echo.Path = req.URL.Path
 	}
 
 	if verb >= verbosity.Normal {
