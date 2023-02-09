@@ -1,11 +1,14 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"github.com/zekroTJA/echo/internal/verbosity"
 )
 
 func InitViper() {
+	godotenv.Load()
+
 	viper.SetDefault(KeyAddr, ":80")
 	viper.SetDefault(KeyVerbosity, verbosity.Normal)
 	viper.SetDefault(KeyDebug, false)
