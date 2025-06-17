@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>echo</title>
+
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+
+            ul {
+                list-style-type: disc;
+                margin: 0 0 0 1.5em;
+                line-height: 1.5em;
+                padding: 0;
+            }
+
+            table {
+                border-collapse: collapse;
+                border: solid 1px #686868;
+                width: 100%;
+            }
+
+            td,
+            th {
+                text-align: start;
+                border-bottom: solid 1px #686868;
+                padding: 0.2em 0.5em;
+            }
+
+            tbody > tr:hover {
+                background-color: #e5e5e5;
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+
+            div.body {
+                background-color: #ededed;
+                padding: 0.5em;
+            }
+
+            div.body > code {
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Details</h2>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Method</th>
+                    <td>{{.Method}}</td>
+                </tr>
+                <tr>
+                    <th>Host</th>
+                    <td>{{.Host}}</td>
+                </tr>
+                <tr>
+                    <th>RemoteAddress</th>
+                    <td>{{.RemoteAddress}}</td>
+                </tr>
+                <tr>
+                    <th>Path</th>
+                    <td>{{.Path}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {{ if gt (len .Header) 0 }}
+        <h2>Header</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $key, $value := .Header }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td>
+                        {{ if gt (len $value) 1 }}
+                        <ul>
+                            {{ range $v := $value }}
+                            <li>{{ $v }}</li>
+                            {{ end }}
+                        </ul>
+                        {{ else }} {{ index $value 0 }} {{ end }}
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+        {{ end }}
+
+        <!----->
+
+        {{ if gt (len .Query) 0 }}
+        <h2>Query Parameters</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $key, $value := .Query }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td>
+                        {{ if gt (len $value) 1 }}
+                        <ul>
+                            {{ range $v := $value }}
+                            <li>{{ $v }}</li>
+                            {{ end }}
+                        </ul>
+                        {{ else }} {{ index $value 0 }} {{ end }}
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </body>
+    {{ end }}
+
+    <!----->
+
+    {{ if gt (len .BodyString) 0 }}
+    <h2>Body</h2>
+    <div class="body">
+        <code>{{ .BodyString }}</code>
+    </div>
+    {{ end }}
+</html>

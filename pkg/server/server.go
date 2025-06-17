@@ -1,13 +1,22 @@
 package server
 
 import (
+	"bytes"
+	"embed"
 	"encoding/json"
 	"io"
+	"net/http"
+	"strings"
+	"text/template"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zekroTJA/echo/pkg/verbosity"
-	"gopkg.in/yaml.v2"
 )
+
+//go:embed templates
+var pages embed.FS
+
+var tpl = template.Must(template.New("").ParseFS(pages, "templates/*.html"))
 
 type Server struct {
 	addr      string
@@ -63,34 +72,41 @@ func (s *Server) echoHandler(c *gin.Context) {
 	if verb >= verbosity.Detailed {
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
-			respondError(c, 500, err)
+			respondError(c, http.StatusInternalServerError, err)
 			return
 		}
 		echo.BodyString = string(body)
 	}
 
-	respondRes(c, echo)
+	respondRes(c, &echo)
 }
 
 func respondError(ctx *gin.Context, status int, err error) {
 	ctx.String(status, err.Error())
 }
 
-func respondRes(ctx *gin.Context, res interface{}) {
-	typ := ctx.Query("type")
+func respondRes(ctx *gin.Context, res *echoObject) {
+
+	accept := ctx.GetHeader("Accept")
+
 	var data []byte
 	var contentType string
 
-	switch typ {
-	case "yml", "yaml":
-		data, _ = yaml.Marshal(res)
-		contentType = "text/yaml"
-	default:
+	if strings.Contains(accept, "text/html") {
+		buf := bytes.NewBuffer(data)
+		err := tpl.ExecuteTemplate(buf, "main.html", res)
+		if err != nil {
+			respondError(ctx, http.StatusInternalServerError, err)
+			return
+		}
+		data = buf.Bytes()
+		contentType = "text/html; charset=utf-8"
+	} else {
 		data, _ = json.MarshalIndent(res, "", "  ")
-		contentType = "application/json"
+		contentType = "application/json; charset=utf-8"
 	}
 
-	ctx.Data(200, contentType, data)
+	ctx.Data(http.StatusOK, contentType, data)
 }
 
 func (s *Server) Run() error {
