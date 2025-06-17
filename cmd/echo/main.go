@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/spf13/viper"
-	"github.com/zekroTJA/echo/internal/config"
-	"github.com/zekroTJA/echo/internal/server"
-	"github.com/zekroTJA/echo/internal/verbosity"
+	"github.com/zekroTJA/echo/pkg/config"
+	"github.com/zekroTJA/echo/pkg/server"
+	"github.com/zekroTJA/echo/pkg/verbosity"
 )
 
 func main() {

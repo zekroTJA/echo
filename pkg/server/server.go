@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zekroTJA/echo/internal/verbosity"
+	"github.com/zekroTJA/echo/pkg/verbosity"
 	"gopkg.in/yaml.v2"
 )
 

@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
-	"github.com/zekroTJA/echo/internal/verbosity"
+	"github.com/zekroTJA/echo/pkg/verbosity"
 )
 
 func InitViper() {
