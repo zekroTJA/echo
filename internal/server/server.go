@@ -2,7 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zekroTJA/echo/internal/verbosity"
@@ -13,7 +13,7 @@ type Server struct {
 	addr      string
 	verbosity verbosity.Verbosity
 
-	r *gin.Engine
+	router *gin.Engine
 }
 
 func New(addr string, verb verbosity.Verbosity, debug bool) *Server {
@@ -24,7 +24,7 @@ func New(addr string, verb verbosity.Verbosity, debug bool) *Server {
 	s := &Server{
 		addr:      addr,
 		verbosity: verb,
-		r:         gin.Default(),
+		router:    gin.Default(),
 	}
 
 	s.registerHandlers()
@@ -33,7 +33,7 @@ func New(addr string, verb verbosity.Verbosity, debug bool) *Server {
 }
 
 func (s *Server) registerHandlers() {
-	s.r.Any("/*path", s.echoHandler)
+	s.router.Any("/*path", s.echoHandler)
 }
 
 func (s *Server) echoHandler(c *gin.Context) {
@@ -61,7 +61,7 @@ func (s *Server) echoHandler(c *gin.Context) {
 	}
 
 	if verb >= verbosity.Detailed {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			respondError(c, 500, err)
 			return
@@ -94,5 +94,5 @@ func respondRes(ctx *gin.Context, res interface{}) {
 }
 
 func (s *Server) Run() error {
-	return s.r.Run(s.addr)
+	return s.router.Run(s.addr)
 }
