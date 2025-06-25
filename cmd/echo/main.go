@@ -12,7 +12,6 @@ import (
 type Config struct {
 	Address   string              `arg:"-a,--address,env:ECHO_ADDRESS" default:":80"`
 	Verbosity verbosity.Verbosity `arg:"-v,--verbosity,env:ECHO_VERBOSITY" default:"normal"`
-	Debug     bool                `arg:"--debug,env:ECHO_DEBUG"`
 }
 
 func main() {
@@ -21,7 +20,7 @@ func main() {
 
 	pp.Println(cfg)
 
-	s := server.New(cfg.Address, cfg.Verbosity, cfg.Debug)
+	s := server.New(cfg.Address, cfg.Verbosity)
 	log.Printf("Running server on address %s...", cfg.Address)
 	if err := s.Run(); err != nil {
 		log.Fatalf("Failed starting server: %s", err.Error())

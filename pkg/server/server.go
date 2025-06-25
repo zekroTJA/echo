@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bytes"
 	"embed"
 	"encoding/json"
 	"io"
@@ -9,7 +8,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/gin-gonic/gin"
 	"github.com/zekroTJA/echo/pkg/verbosity"
 )
 
@@ -21,34 +19,24 @@ var tpl = template.Must(template.New("").ParseFS(pages, "templates/*.html"))
 type Server struct {
 	addr      string
 	verbosity verbosity.Verbosity
-
-	router *gin.Engine
+	mux       *http.ServeMux
 }
 
-func New(addr string, verb verbosity.Verbosity, debug bool) *Server {
-	if !debug {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
+func New(addr string, verb verbosity.Verbosity) *Server {
 	s := &Server{
 		addr:      addr,
 		verbosity: verb,
-		router:    gin.Default(),
 	}
 
-	s.registerHandlers()
+	s.mux = http.NewServeMux()
+	s.mux.HandleFunc("/", s.echoHandler)
 
 	return s
 }
 
-func (s *Server) registerHandlers() {
-	s.router.Any("/*path", s.echoHandler)
-}
+func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 
-func (s *Server) echoHandler(c *gin.Context) {
-	req := c.Request
-
-	query := req.URL.Query()
+	query := r.URL.Query()
 
 	verb, err := verbosity.FromString(query.Get("verbosity"))
 	if err != nil {
@@ -58,57 +46,53 @@ func (s *Server) echoHandler(c *gin.Context) {
 	var echo echoObject
 
 	if verb >= verbosity.Minimal {
-		echo.Method = req.Method
-		echo.Path = req.URL.Path
+		echo.Method = r.Method
+		echo.Path = r.URL.Path
 	}
 
 	if verb >= verbosity.Normal {
-		echo.Host = req.Host
+		echo.Host = r.Host
 		echo.Query = query
-		echo.Header = req.Header
-		echo.RemoteAddress = req.RemoteAddr
+		echo.Header = r.Header
+		echo.RemoteAddress = r.RemoteAddr
 	}
 
 	if verb >= verbosity.Detailed {
-		body, err := io.ReadAll(req.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			respondError(c, http.StatusInternalServerError, err)
+			respondError(w, http.StatusInternalServerError, err)
 			return
 		}
 		echo.BodyString = string(body)
 	}
 
-	respondRes(c, &echo)
+	respondRes(w, r, &echo)
 }
 
-func respondError(ctx *gin.Context, status int, err error) {
-	ctx.String(status, err.Error())
+func respondError(w http.ResponseWriter, status int, err error) {
+	w.WriteHeader(status)
+	w.Write([]byte(err.Error()))
 }
 
-func respondRes(ctx *gin.Context, res *echoObject) {
+func respondRes(w http.ResponseWriter, r *http.Request, res *echoObject) {
 
-	accept := ctx.GetHeader("Accept")
-
-	var data []byte
-	var contentType string
+	accept := r.Header.Get("Accept")
 
 	if strings.Contains(accept, "text/html") {
-		buf := bytes.NewBuffer(data)
-		err := tpl.ExecuteTemplate(buf, "main.html", res)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		err := tpl.ExecuteTemplate(w, "main.html", res)
 		if err != nil {
-			respondError(ctx, http.StatusInternalServerError, err)
+			respondError(w, http.StatusInternalServerError, err)
 			return
 		}
-		data = buf.Bytes()
-		contentType = "text/html; charset=utf-8"
 	} else {
-		data, _ = json.MarshalIndent(res, "", "  ")
-		contentType = "application/json; charset=utf-8"
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "  ")
+		enc.Encode(res)
 	}
-
-	ctx.Data(http.StatusOK, contentType, data)
 }
 
 func (s *Server) Run() error {
-	return s.router.Run(s.addr)
+	return http.ListenAndServe(s.addr, s.mux)
 }
