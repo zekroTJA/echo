@@ -1,15 +1,21 @@
 module github.com/zekroTJA/echo
 
-go 1.15
+go 1.24.3
 
 require (
-	github.com/gin-gonic/gin v1.8.2
-	github.com/go-playground/validator/v10 v10.11.2 // indirect
-	github.com/goccy/go-json v0.10.0 // indirect
-	github.com/joho/godotenv v1.5.1
+	github.com/alexflint/go-arg v1.5.1
+	github.com/k0kubun/pp/v3 v3.4.1
+	github.com/stretchr/testify v1.10.0
+	github.com/zekrotja/parsables v1.0.0
+)
+
+require (
+	github.com/alexflint/go-scalar v1.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/spf13/viper v1.15.0
-	github.com/ugorji/go/codec v1.2.9 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
