@@ -11,10 +11,9 @@ import (
 )
 
 type Config struct {
-	Address       string              `arg:"-a,--address,env:ECHO_ADDRESS" default:":80"`
-	Verbosity     verbosity.Verbosity `arg:"-v,--verbosity,env:ECHO_VERBOSITY" default:"normal"`
-	BodyLimit     parsables.FileSize  `arg:"--body-limit,env:ECHO_BODY_LIMIT" default:"512kib"`
-	BodyReadLimit string
+	Address   string              `arg:"-a,--address,env:ECHO_ADDRESS" default:":80"`
+	Verbosity verbosity.Verbosity `arg:"-v,--verbosity,env:ECHO_VERBOSITY" default:"normal"`
+	BodyLimit parsables.FileSize  `arg:"--body-limit,env:ECHO_BODY_LIMIT" default:"512kib"`
 }
 
 func main() {
