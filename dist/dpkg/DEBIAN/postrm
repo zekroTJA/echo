@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    remove)
+        deb-systemd-helper disable echo-server.service >/dev/null || true
+        ;;
+
+    purge)
+        deb-systemd-helper purge echo-server.service >/dev/null || true
+        deb-systemd-helper unmask echo-server.service >/dev/null || true
+        ;;
+
+    *)
+        ;;
+esac

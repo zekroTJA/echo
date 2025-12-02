@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -ex
+
+deb-systemd-helper enable echo-server.service
