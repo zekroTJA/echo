@@ -44,6 +44,7 @@ jobs:
         with:
           name: ${{ env.ASSET_PATH }}
           path: ${{ env.ASSET_PATH }}
+          if-no-files-found: error
 
   build_dpkg:
     name: Build DPKG Packages
@@ -52,6 +53,8 @@ jobs:
       - build_artifacts
     strategy:
       matrix:
+        goos:
+          - linux
         goarch:
           - amd64
           - arm64
@@ -61,23 +64,28 @@ jobs:
       - name: Retrieve backend binaries
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-${{ matrix.goarch }}
+          name: echo-${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/dpkg/usr/local/bin
       - name: Rename binary
         run: |
           mv dist/dpkg/usr/local/bin/echo* dist/dpkg/usr/local/bin/echo-server
           chmod +x dist/dpkg/usr/local/bin/echo-server
       - name: Build dpkg package
-        run: bash ./scripts/build-dpkg-package.sh ${{ matrix.goarch }}
+        run: |
+          bash ./scripts/build-dpkg-package.sh ${{ matrix.goarch }} echo-${{ matrix.goos }}-${{ matrix.goarch }}.deb
+          ls -lsh .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: echo-${{ matrix.goarch }}.deb
-          path: echo-${{ matrix.goarch }}.deb
+          name: echo-${{ matrix.goos }}-${{ matrix.goarch }}.deb
+          path: echo-${{ matrix.goos }}-${{ matrix.goarch }}.deb
+          if-no-files-found: error
 
   create_release:
     name: Create GitHub Release
-    needs: build_artifacts
+    needs:
+      - build_artifacts
+      - build_dpkg
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -87,7 +95,7 @@ jobs:
           path: ./artifacts
 
       - name: List downloaded files (debug)
-        run: ls -R ./artifacts
+        run: ls -lshR ./artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
