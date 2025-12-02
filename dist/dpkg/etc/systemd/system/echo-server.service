@@ -1,0 +1,14 @@
+[Unit]
+Description=echo server
+After=network.target auditd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/echo-server
+EnvironmentFile=/etc/echo-server/vars.env
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=default.target
+Alias=echo.service

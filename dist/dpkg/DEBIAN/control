@@ -1,0 +1,7 @@
+Package: echo-server
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Ringo Hoffmann <contact@zekro.de>
+Description: A simple HTTP echo server to debug reverse proxy configurations.
