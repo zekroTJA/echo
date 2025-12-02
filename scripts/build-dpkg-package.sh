@@ -13,5 +13,7 @@ tag=$(git describe --tag --abbrev=0)
 sed 's/<<VERSION>>/'"${tag:1}"'/' -i dist/dpkg/DEBIAN/control
 sed 's/<<ARCH>>/'"${arch}"'/' -i dist/dpkg/DEBIAN/control
 
+chmod 555 dist/dpkg/DEBIAN/postinst dist/dpkg/DEBIAN/postrm
+
 dpkg-deb -Zxz --build --root-owner-group \
     dist/dpkg "${2:-"echo-${arch}.deb"}"
