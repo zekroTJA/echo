@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -54,6 +55,8 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
+
+	slog.Info("received request", "method", r.Method, "path", r.URL)
 
 	query := r.URL.Query()
 
